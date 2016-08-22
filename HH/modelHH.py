@@ -17,8 +17,9 @@ gbar_l  = 0.3    #mS/cm2
 E_Na    = 115    #mV
 E_k     = -12    #mV
 E_l     = 10.613 #mV
-
+I_apply = 30    #mV
 #kanal K
+
 def alpha_n(V):
     if V != 10:
         return 0.01*(-V + 10)/(np.exp((-V+10)/10)-1)
@@ -72,7 +73,7 @@ def Neuron(Y, time):
 
 def I(t):
 	if (10 <= t <= 55):
-	    return 30
+	    return I_apply
 	else:
 		return 0
   
@@ -106,11 +107,16 @@ def plot_chanel_parameters():
     Y_n_inf = map(n_inf, V)
     Y_m_inf = map(m_inf, V)
     Y_h_inf = map(h_inf, V)
-    plt.plot(V, Y_n_inf, linewidth = 2)
-    plt.plot(V, Y_m_inf, linewidth = 2)
-    plt.plot(V, Y_h_inf, linewidth = 2)
-    plt.legend(('n','m','h'))
+    plt.plot(V, Y_n_inf, linewidth = 2, label = r"$n_{inf}$")
+    plt.plot(V, Y_m_inf, linewidth = 2, label = r"$m_{inf}$")
+    plt.plot(V, Y_h_inf, linewidth = 2, label = r"$h_{inf}$")
+    plt.legend(loc=5)
     plt.xlabel(u"Napięcie [mV]")
+    plt.ylabel("Stan bramki")
+    plt.xlim(-55, 155)
+    plt.ylim(-0.05,1.05)
     plt.grid(True)
     plt.show()
 
+plot_chanel_parameters()
+solve()
