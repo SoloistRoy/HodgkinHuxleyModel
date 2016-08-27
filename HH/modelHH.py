@@ -1,5 +1,6 @@
-#-*-Encoding:utf-8-*-
+# -*- coding: utf-8 -*-
 from __future__ import division
+from __future__ import unicode_literals
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,8 +8,10 @@ from scipy.integrate import odeint
 
 matplotlib.use('GTK')
 plt.rcParams.update({'font.size':25})
+matplotlib.rc('font', family='Arial')
+matplotlib.rcParams['text.latex.unicode'] = True
 
-# HH parameters
+# HH parametry
 V_rest  = 0      #mV
 Cm      = 1      #uF/cm2
 gbar_Na = 120    #mS/cm2
@@ -17,20 +20,24 @@ gbar_l  = 0.3    #mS/cm2
 E_Na    = 115    #mV
 E_k     = -12    #mV
 E_l     = 10.613 #mV
-I_apply = 30    #mV
-#kanal K
+I_apply = 120    #mV
 
+
+#kanal K
 def alpha_n(V):
     if V != 10:
         return 0.01*(-V + 10)/(np.exp((-V+10)/10)-1)
     else:
         return 0.1
 
+
 def beta_n(V):
     return 0.125*np.exp(-V/80)
 
+
 def n_inf(V):
     return alpha_n(V)/(alpha_n(V) + beta_n(V))
+
 
 #kanal Na (aktywny)
 def alpha_m(V):
@@ -39,18 +46,23 @@ def alpha_m(V):
      else:
          return 1
 
+
 def beta_m(V):
     return 4*np.exp(-V/18)
 
+
 def m_inf(V):
     return alpha_m(V)/(alpha_m(V) + beta_m(V))
+
 
 #knal Na (nieaktywny)
 def alpha_h(V):
     return 0.07*np.exp(-V/20)
 
+
 def beta_h(V):
     return 1/(np.exp((-V+30)/10)+1)
+
 
 def h_inf(V):
     return alpha_h(V)/(alpha_h(V) + beta_h(V))
@@ -72,15 +84,15 @@ def Neuron(Y, time):
     
 
 def I(t):
-	if (10 <= t <= 55):
-	    return I_apply
-	else:
-		return 0
+    if (10 <= t <= 55):
+        return I_apply
+    else:
+        return 0
   
 
 def solve():
     T = 100      #ms
-    dt = 0.025  #ms
+    dt = 0.025      #ms
     time = np.arange(0, T+dt, dt)
     m0 = m_inf(V_rest)
     h0 = h_inf(V_rest)
@@ -89,16 +101,16 @@ def solve():
     Y = odeint(Neuron, y_0, time)
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
-    ax1.plot(time,Y[:,0], linewidth = 2, color='blue')
-    I_s = map(I,time)
-    ax2.plot(time, I_s, 'r-',linewidth = 2)
+    ax1.plot(time, Y[:,0], linewidth = 2, color='blue')
+    I_simulation = map(I,time)
+    ax2.plot(time, I_simulation, 'r-',linewidth = 2)
     plt.grid(True)
     plt.title("Hodgkin-Huxley model")
-    ax1.set_xlabel("Time [ms]")
-    ax1.set_ylabel("Membrane Potential [mV]", color='b')
-    ax2.set_ylabel(r"Current [$\frac{\mathtt{uA}}{\mathtt{cm^2}}$]", color='r')
+    ax1.set_xlabel("czas [ms]")
+    ax1.set_ylabel(r"Potencjał na membranie [$\mathtt{mV}$]", color='b')
+    ax2.set_ylabel(r"Prąd aplikowany [$\frac{\mathtt{uA}}{\mathtt{cm^2}}$]", color='r')
     ax2.set_ylim([-20, 120])
-    plt.text(56, 35, r"$I=30 \frac{\mathtt{uA}}{\mathtt{cm^2}}$ ", color = 'red')
+    plt.text(56, I_apply+5, r"$I=%d \frac{\mathtt{uA}}{\mathtt{cm^2}}$ " %I_apply, color = 'red')
     plt.show()
 
 
